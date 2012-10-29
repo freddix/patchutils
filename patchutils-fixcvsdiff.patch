@@ -1,0 +1,44 @@
+--- fixcvsdiff-ori.in	Fri Apr 19 21:32:12 2002
++++ fixcvsdiff.in	Fri Apr 19 21:36:57 2002
+@@ -10,6 +10,8 @@
+ #
+ # -b keeps a .bak backup file
+ #
++# -a converts pathes to diff'ed files using RCS file path
++# 
+ # Based on code by Amir Karger <karger@post.harvard.edu>
+ #
+ # Modified by John Levon <moz@compsoc.man.ac.uk>
+@@ -20,10 +22,10 @@
+ # your option) any later version.
+ 
+ use Getopt::Std;
+-our ($opt_b,$opt_p);
++our ($opt_b,$opt_p,$opt_a);
+ $add = 0;
+ 
+-getopts('pb');
++getopts('pba');
+ 
+ if (defined($opt_b)) {
+ 	$^I = '.bak';
+@@ -36,6 +38,9 @@
+ 	if (/^Index: (.*)/) {
+ 		$Filename = $1;
+ 	}
++	if (/^RCS\ file: (.*)$Filename,v$/) {
++		$p = $1;
++	}
+ 
+ 	if (!defined($Filename)) {
+ 		print;
+@@ -72,5 +77,9 @@
+ 			$add = 0;
+ 		}
+ 	}
++	if($opt_a) {
++		s#^\-\-\- $Filename#--- $p$Filename#;
++		s#^\+\+\+ $Filename#+++ $p$Filename#;
++	}
+ 	print;
+ }
